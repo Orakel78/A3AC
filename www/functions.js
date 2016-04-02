@@ -34,9 +34,9 @@ Math.eta = function (v, x, fi) {
 
 Math.fi = function (v, x, y, low_angle, g) {
 	'use strict';
-	var v2 = v * v,
-		v4 = v2 * v2,
-		x2 = x * x;
+	var v2 = Math.pow(v, 2),
+		v4 = Math.pow(v, 4),
+		x2 = Math.pow(x, 2);
 
 	if (low_angle === undefined) {
 		low_angle = false;
@@ -51,6 +51,7 @@ Math.fi = function (v, x, y, low_angle, g) {
 	if (!low_angle) {
 		return Math.atan((v2 + Math.sqrt(v4 - g * ((g * x2) + (2 * y * v2)))) / (g * x));
 	}
+	
 	return Math.atan((v2 - Math.sqrt(v4 - g * ((g * x2) + (2 * y * v2)))) / (g * x));
 
 };
@@ -85,12 +86,19 @@ angular.module('armaApp', []).controller('armaCalcController', ['$scope', '$loca
 			i,
 			t,
 			fi,
+			mill,
 			c = ctrl;
 
 		if (p !== undefined) {
 			c.pref = p;
 		}
-
+		if(!ctrl.chDeg)
+		{
+			mill = 17.777777777778;
+		} else {
+			mill = 1;
+		}
+		
 		// Odległość
 		if (!ctrl.insight) {
 			x = Math.round(100 * Math.sqrt(((c.bx - c.tx) * (c.bx - c.tx)) + ((c.by - c.ty) * (c.by - c.ty)))) / 10;
@@ -98,7 +106,7 @@ angular.module('armaApp', []).controller('armaCalcController', ['$scope', '$loca
 			y = Math.round(10 * (c.tz - c.bz)) / 10;
 			c.a = y;
 
-			c.b = Math.floatRound(Math.bearing(c.ty - c.by, c.tx - c.bx), 2);
+			c.b = Math.floatRound((Math.bearing(c.ty - c.by, c.tx - c.bx))*17.777777777778, 2);
 			$('.bearing .range-slider').foundation('slider', 'set_value', Math.round(c.b));
 		} else {
 			x = c.d;
@@ -134,11 +142,11 @@ angular.module('armaApp', []).controller('armaCalcController', ['$scope', '$loca
 				v = v[2]; // prędkość pocisku
 
 				fi = Math.floatRound(Math.deg(Math.fi(v, x, y)), 2);
-				$("#elvh").val(fi);
+				$("#elvh").val((fi*mill).toFixed(2));
 				$("#etah").val(Math.eta(v, x, fi));
 
 				fi = Math.floatRound(Math.deg(Math.fi(v, x, y, true)), 2);
-				$("#elvl").val(fi);
+				$("#elvl").val((fi*mill).toFixed(2));
 				$("#etal").val(Math.eta(v, x, fi));
 			}
 		}
